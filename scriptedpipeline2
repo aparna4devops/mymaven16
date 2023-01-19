@@ -1,24 +1,21 @@
-node('built-in') 
-{
-    stage('continous download') 
-    {
  git 'https://github.com/intelliqittrainings/maven.git'
     }
-stage('continous build') 
+stage('continous build')
     {
   sh 'mvn package'
     }
-    stage('continous Deployment') 
+    stage('continous Deployment')
     {
   sh 'scp /var/lib/jenkins/workspace/scriptedpipeline2/webapp/target/webapp.war ubuntu@172.31.30.227: /var/lib/tomcat9/webapps/testapp.war'
     }
-    stage('continous testing') 
+    stage('continous testing')
     {
   git 'https://github.com/intelliqittrainings/FunctionalTesting.git'
   sh 'java -jar /var/lib/jenkins/workspace/scriptedpipeline2/testing.jar'
     }
-   stage('continous Delivery') 
+   stage('continous Delivery')
     {
   sh 'scp /var/lib/jenkins/workspace/scriptedpipeline2/webapp/target/webapp.war ubuntu@172.31.31.86: /var/lib/tomcat9/webapps/prodapp.war'
-    } 
     }
+    }
+
