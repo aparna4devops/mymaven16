@@ -6,9 +6,9 @@ pipeline
         stage('continous download')
         {
             steps
-            {
-               https://github.com/aparna4devops/mymaven16.git 
-            }
+	    {
+	    git 'https://github.com/aparna4devops/mymaven16.git'
+           }
         }
          stage('continous build')
         {
