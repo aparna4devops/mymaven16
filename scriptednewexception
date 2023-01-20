@@ -1,0 +1,65 @@
+node('built-in') 
+{
+      stage('continous download') 
+    {
+        try
+        {
+          git 'https://github.com/intelliqittrainings/maven.git'
+        }
+           catch(Exception e1)
+        {
+          mail bcc: '', body: 'jenkins has failed in continous download', cc: '', from: '', replyTo: '', subject: 'continous download failed', to: 'git.team@gmail.com'
+          exit(1)
+        }
+    }
+      stage('continous build') 
+    {
+        try
+        {
+        sh 'mvn package'
+        }
+        catch(Exception e2)
+        {
+           mail bcc: '', body: 'jenkins unable to create artifact', cc: '', from: '', replyTo: '', subject: 'continous build failed', to: 'build.team@gmail.com' 
+            exit(1)
+        }
+    }
+     stage('continous Deployment') 
+      {
+          try
+          {
+            deploy adapters: [tomcat9(credentialsId: '6395dc2e-5378-4e00-9d04-1c0a798b3745', path: '', url: 'http://172.31.30.227:8080')], contextPath: 'testapp', war: '**/*.war'
+          }
+             catch(Exception e3)
+          {
+              mail bcc: '', body: 'jenkins unable to deploy the artifact into tomcat on the qa server', cc: '', from: '', replyTo: '', subject: 'deployment failed', to: 'middleware.team@gmail.com'
+               exit(1)
+              
+          }
+   }
+            stage('continous testing') 
+           {
+               try
+               {
+             git 'https://github.com/intelliqittrainings/FunctionalTesting.git'
+             sh 'java -jar /var/lib/jenkins/workspace/scriptedpipeline2/testing.jar'
+               }
+               catch(Exception e4)
+               {
+                  mail bcc: '', body: 'selinium scripts are failed', cc: '', from: '', replyTo: '', subject: 'testing failed', to: 'testing.team@gmail.com' 
+                   exit(1)
+               }
+           }
+            stage('continous Delivery') 
+           {
+               try
+               {
+               input message: 'waiting for approval from the manager', submitter: 'manager'
+               deploy adapters: [tomcat9(credentialsId: '6395dc2e-5378-4e00-9d04-1c0a798b3745', path: '', url: 'http://172.31.31.86:8080')], contextPath: 'prodapp', war: '**/*.war'
+               }
+               catch(Exception e5)
+               {
+                   mail bcc: '', body: 'jenkins unable to deploy the artifact into tomcat on the prodserver', cc: '', from: '', replyTo: '', subject: 'Delivery failed', to: 'delivery.team@gmail.com'
+               }
+           }
+    }
