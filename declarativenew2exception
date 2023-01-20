@@ -1,0 +1,102 @@
+pipeline
+{
+   agent any
+    
+   stages
+   {
+     stage('continous download')
+     {
+       steps
+       {
+         script
+          {
+            try
+            {
+             git 'https://github.com/aparna4devops/mymaven16.git'
+            }  
+             catch(Exception e)
+             {
+              mail bcc: '', body: 'jenkins has failed in continous download', cc: '', from: '', replyTo: '', subject: 'continous download failed', to: 'git.team@gmail.com'
+              exit(1)
+             }          
+          }
+       }
+      }
+       stage('continous build')
+        {
+         steps
+         {
+           script
+            {
+             try
+              {          
+               sh 'mvn package' 
+              }
+              catch(Exception e1)
+              {
+                mail bcc: '', body: 'jenkins unable to create artifcat', cc: '', from: '', replyTo: '', subject: 'continous build failed', to: 'build.team@gmail.com'
+                exit(2)
+              }
+            }         
+         }
+      }
+         stage('continous deployment')
+         {
+          steps
+         {
+          script
+           {
+             try
+              {         
+                sh 'scp /var/lib/jenkins/workspace/declarativepipeline/webapp/target/webapp.war ubuntu@172.31.30.227:/var/lib/tomcat9/webapps/testapp.war'
+              } 
+               catch(Exception e3)
+              {
+                 mail bcc: '', body: 'jenkins unable to deploy the artifact into tomcat on the qa server', cc: '', from: '', replyTo: '', subject: 'continous deployment failed', to: 'middleware.team@gmail.com'
+                 exit(3)
+             }     
+         }
+      }
+    }       
+         stage('continous testing')
+          {
+           steps
+           {
+            script 
+             {
+              try
+              {          
+                git 'https://github.com/intelliqittrainings/FunctionalTesting.git'
+                sh 'java -jar /var/lib/jenkins/workspace/declarativenew2/testing.jar'
+              }
+               catch(Exception e4)
+               {
+                mail bcc: '', body: 'selinium scripts are failed', cc: '', from: '', replyTo: '', subject: 'continous testing failed', to: 'testing.team@gmail.com'  
+                exit(2)       
+               }
+            }         
+        }
+      }
+           stage('continous Delivery')
+           {
+              steps
+               {
+                 script
+                   {
+                     try
+                     {             
+                     sh 'scp /var/lib/jenkins/workspace/Declarativepipeline2/webapp/target/webapp.war ubuntu@172.31.31.86:/var/lib/tomcat9/webapps/prodapp.war'
+                     } 
+                     catch(Exception e5)
+                     {
+                      mail bcc: '', body: 'jenkins is unable to deploy the artifact into tomcat on the prod server', cc: '', from: '', replyTo: '', subject: 'Delivery failed', to: 'delivery.team@gmail.com'
+                      exit(2)
+                      }         
+                   }
+               }
+            }
+        
+          }
+        }
+
+
