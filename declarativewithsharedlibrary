@@ -1,0 +1,59 @@
+@Library('newlibrary')_
+pipeline
+{
+    agent any
+    stages
+    {
+        stage('continous download')
+        {
+            steps
+            {
+                script
+                {
+                 cicd.newGit("https://github.com/aparna4devops/mymaven16.git")
+                }
+            }
+        }
+        stage('continous build')
+        {
+            steps
+            {
+                script
+                {
+                    cicd.newmaven()
+                }
+            }
+        }
+        stage('continous Deployment')
+        {
+            steps
+            {
+                script
+                {
+                    cicd.newDeploy("declarativewithsharedlibrary","172.31.30.227","testapp")
+                }
+            }
+        }
+        stage('continous testing')
+        {
+            steps
+            {
+                script
+                {
+                 cicd.newGit("https://github.com/intelliqittrainings/FunctionalTesting.git")
+                 cicd.runselenium("declarativewithsharedlibrary")
+                }
+            }
+        }
+        stage('continous Delivery')
+        {
+            steps
+            {
+                script
+                {
+                    cicd.newDeploy("declarativewithsharedlibrary","172.31.31.86","prodapp")
+                }
+            }
+        }
+    }
+}
