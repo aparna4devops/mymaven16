@@ -1,0 +1,25 @@
+@Library('newlibrary')_
+node('built-in')
+{
+    stage('continous Download')
+    {
+      cicd.newGit("https://github.com/aparna4devops/mymaven16.git")
+    }
+    stage('continous build')
+    {
+      cicd.newmaven()
+    }
+    stage('continous Deployment')
+    {
+        cicd.newDeploy("Scriptedwithsharedlibrary","172.31.30.227","testapp")
+    }
+    stage('continous Testing')
+    {
+     cicd.newGit("https://github.com/intelliqittrainings/FunctionalTesting.git")
+     cicd.runselenium("Scriptedwithsharedlibrary")
+    }
+    stage('continous Delivery')
+    {
+      cicd.newDeploy("Scriptedwithsharedlibrary","172.31.31.86","prodapp") 
+    }
+}
